@@ -1,65 +1,82 @@
 package generator
 
+import java.io.{File, FileWriter}
+
+import com.typesafe.scalalogging.LazyLogging
 import generator.Sudoku._
+import generator.levels.Level
+import generator.levels.Level.{Easy, Hard, Intermediate}
+import solver.SimpleSolver
 
-import scala.annotation.tailrec
-import scala.util.Random
+import scala.io.Source
+import scala.util.{Random, Try, Using}
 
-class Sudoku(val a: Grid) {
+class Sudoku(val g: Grid) extends LazyLogging {
 
-  val rows: RowColumn = Array.fill(9)(Set[Int]())
-  val columns: RowColumn = Array.fill(9)(Set[Int]())
-  val boxes: Boxes = Array.fill(3, 3)(Set[Int]())
-
-  for {
-    x <- 0 to 8
-    y <- 0 to 8
-  }
-    if (a(x)(y) != 0)
-      setExist(a(x)(y), x, y)
-
-  private def setExist(v: Int, x: Int, y: Int): Unit = {
-    rows(x) += v
-    columns(y) += v
-    boxes(x / 3)(y / 3) += v
-  }
-
-  def fill(x: Int, y: Int): Boolean = {
-    if (a(x)(y) == 0) {
-      var candidates = Set() ++ (1 to 9) -- rows(x) -- columns(y) -- boxes(x / 3)(y / 3)
-
-      @tailrec
-      def current(): Boolean = {
-        if (candidates.isEmpty)
-          false
-        else {
-          val v = Random.shuffle(candidates.toList).iterator.next
-          candidates -= v
-          a(x)(y) = v
-          setExist(v, x, y)
-          val good = if (y < 8) fill(x, y + 1) else if (x < 8) fill(x + 1, 0) else true
-          if (good)
-            true
-          else {
-            a(x)(y) = 0
-            rows(x) -= v
-            columns(y) -= v
-            boxes(x / 3)(y / 3) -= v
-            current()
-          }
-        }
+  def printout: Unit = {
+    println("+" + "---+" * 9)
+    for ((row, i) <- g.zipWithIndex) {
+      val r = row.map { v =>
+        if (v != 0) v.toString else " "
       }
-
-      current()
+      print("|")
+      for (j <- 0 until 3)
+        print(s" ${r(j)}   ${r(j + 1)}   ${r(j + 2)} |")
+      println()
+      if (i % 3 == 2)
+        println("+" + "---+" * 9)
+      else
+        println("+" + "   +" * 9)
     }
-    else if (y < 8) fill(x, y + 1) else if (x < 8) fill(x + 1, 0) else true
   }
 
-  fill(0, 0)
+  def toFile(fileName: String, delimiter: String = " "): Try[Unit] = {
+    val grid: String = g.map { row => row.mkString(delimiter) }.mkString("\n")
+    val writer = Try(new FileWriter(new File(fileName)))
+    writer
+      .map {
+        w => w.write(grid); w
+      }
+      .recoverWith {
+        case ex: Exception =>
+          logger.error(s"Error in saving to file:\n${ex.getMessage}")
+          writer
+      }
+      .map(_.close())
+  }
+
 }
 
 object Sudoku {
   type Grid = Array[Array[Int]]
   type Boxes = Array[Array[Set[Int]]]
   type RowColumn = Array[Set[Int]]
+
+  def apply(level: Level): Sudoku = {
+    val grid = new SimpleSolver().solve(Array.fill(9, 9)(0))
+    val sudoku = new Sudoku(grid)
+    level match {
+      case Easy => remove(sudoku.g, 20)
+      case Intermediate => remove(sudoku.g, 40)
+      case Hard => remove(sudoku.g, 60)
+    }
+    sudoku
+  }
+
+  private def remove(a: Grid, count: Int): Unit = {
+    val rs = Random.shuffle(List.range(0, 81))
+    for (i <- 0 until count)
+      a(rs(i) / 9)(rs(i) % 9) = 0
+  }
+
+
+  def fromFile(fileName: String): Try[Sudoku] =
+    Using(Source.fromFile(fileName)) { source =>
+      source.getLines()
+        .map {
+          _.split(" ").map(_.trim.toInt)
+        }
+        .toArray
+    }.map(new Sudoku(_))
+
 }
