@@ -1,44 +1,35 @@
 package ui
 
-import java.awt.Color
-
-import javax.swing.UIManager
-import javax.swing.plaf.nimbus.NimbusLookAndFeel
+import generator.Sudoku
+import javax.swing.{LookAndFeel, UIManager, WindowConstants}
+import solver.SimpleSolver
 
 import scala.swing.BorderPanel.Position._
 import scala.swing._
 
-class SudokuUI extends Frame {
-
-  UIManager.setLookAndFeel(new NimbusLookAndFeel)
-
+class SudokuUI(sudoku: Sudoku) extends Frame {
   title = "GA solving sudoku"
-  size = new Dimension(200, 200)
+  preferredSize = new Dimension(Size.WIDTH, Size.HEIGHT)
 
-  val button = new Button {
-    text = "Start solving sudoku"
-    foreground = Color.BLACK
-  }
+  val mainPanel = new SudokuMainPanel(sudoku)
+  menuBar = new SudokuMenuUI(sudoku, mainPanel, new SimpleSolver)
+
   contents = new BorderPanel {
-    layout(button) = North
+    layout(mainPanel) = Center
   }
-  menuBar = new MenuBar {
-    contents += new Menu("Sudoku") {
-      contents += new MenuItem(Action("Open") {
-        println("Opening sudoku")
-      })
-      contents += new MenuItem(Action("Generate") {
-        println("Generating sudoku")
-      })
-    }
-  }
-  // pack()
   centerOnScreen()
 }
 
 object SudokuUI {
-  def create: Unit = {
-    new SudokuUI()
-      .open()
+  def create(sudoku: Sudoku, look: LookAndFeel): Unit = {
+    UIManager.setLookAndFeel(look)
+    val s = new SudokuUI(sudoku)
+    s.peer.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE)
+    s.open()
   }
+}
+
+object Size {
+  val WIDTH = 600
+  val HEIGHT = 600
 }

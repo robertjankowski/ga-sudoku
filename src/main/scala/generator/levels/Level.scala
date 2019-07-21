@@ -11,3 +11,9 @@ object Level {
   case object Hard extends Level
 
 }
+
+object levelToString {
+  implicit def levelToString(level: Level): String = {
+    level.toString
+  }
+}
