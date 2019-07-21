@@ -16,4 +16,7 @@ scalacOptions ++= Seq(
   "-language:postfixOps"
 )
 
-libraryDependencies += "com.typesafe.scala-logging" %% "scala-logging" % "3.9.2"
+libraryDependencies ++= Seq(
+  "com.typesafe.scala-logging" %% "scala-logging" % "3.9.2",
+  "org.scala-lang.modules" %% "scala-swing" % "2.1.1"
+)

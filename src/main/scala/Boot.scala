@@ -1,5 +1,6 @@
 import generator.Sudoku
 import generator.levels.Level
+import ui.SudokuUI
 
 object Boot extends App {
 
@@ -15,4 +16,5 @@ object Boot extends App {
       }
   }
 
+  SudokuUI.create
 }
