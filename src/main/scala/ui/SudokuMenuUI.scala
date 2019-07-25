@@ -2,19 +2,30 @@ package ui
 
 import java.awt.Font
 
+import com.typesafe.scalalogging.LazyLogging
 import generator.Sudoku
 import generator.levels.Level
 import generator.levels.levelToString._
 import solver.Solver
 
-import scala.swing.{Action, Menu, MenuBar, MenuItem}
+import scala.concurrent.ExecutionContext
+import scala.swing.{Action, FileChooser, Menu, MenuBar, MenuItem}
+import scala.util.{Failure, Success}
 
-class SudokuMenuUI(sudoku: Sudoku, sudokuMainPanel: SudokuMainPanel, solver: Solver) extends MenuBar {
+class SudokuMenuUI(sudoku: Sudoku,
+                   sudokuMainPanel: SudokuMainPanel,
+                   solver: Solver)
+                  (implicit executionContext: ExecutionContext) extends MenuBar with LazyLogging {
 
   contents += new Menu("File") {
     contents += new MenuItem(Action("Open sudoku") {
-      println("Opening sudoku")
-      sudoku.printout
+      val fc = new FileChooser()
+      fc.showOpenDialog(null)
+      Sudoku.fromFile(fc.selectedFile).foreach { s =>
+        sudoku.changeGrid(s.g)
+        sudokuMainPanel.updateLabels(s)
+        sudokuMainPanel.revalidate()
+      }
     })
   }
 
@@ -26,11 +37,15 @@ class SudokuMenuUI(sudoku: Sudoku, sudokuMainPanel: SudokuMainPanel, solver: Sol
 
   contents += new Menu("Solver") {
     contents += new MenuItem(Action("Simple solver") {
-      sudokuMainPanel.updateLabels(new Sudoku(solver.solve(sudoku.g)))
-      sudokuMainPanel.revalidate()
+      solver.solve(sudoku.g).onComplete {
+        case Failure(ex) => logger.error(s"Error occurs in solving sudoku: [${ex.getMessage}]")
+        case Success(grid) =>
+          sudokuMainPanel.updateLabels(new Sudoku(grid))
+          sudokuMainPanel.revalidate()
+      }
     })
     contents += new MenuItem(Action("GA solver") {
-      println("GA not implemented yet")
+      logger.debug("GA not implemented yet")
     })
   }
 

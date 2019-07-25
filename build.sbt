@@ -17,6 +17,7 @@ scalacOptions ++= Seq(
 )
 
 libraryDependencies ++= Seq(
+  "ch.qos.logback" % "logback-classic" % "1.2.3",
   "com.typesafe.scala-logging" %% "scala-logging" % "3.9.2",
   "org.scala-lang.modules" %% "scala-swing" % "2.1.1"
 )

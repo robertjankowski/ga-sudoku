@@ -3,18 +3,21 @@ package solver
 import generator.Sudoku.{Boxes, Grid, RowColumn}
 
 import scala.annotation.tailrec
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Random
 
-class SimpleSolver extends Solver {
+class SimpleSolver(implicit executionContext: ExecutionContext) extends Solver {
 
-  override def solve(sudoku: Grid): Grid = {
+  private val rows: RowColumn = Array.fill(9)(Set[Int]())
+  private val columns: RowColumn = Array.fill(9)(Set[Int]())
+  private val boxes: Boxes = Array.fill(3, 3)(Set[Int]())
+
+  override def solve(sudoku: Grid): Future[Grid] = {
     for {
       x <- 0 to 8
       y <- 0 to 8
-    }
       if (sudoku(x)(y) != 0)
-        setExist(sudoku(x)(y), x, y)
-    fill(0, 0)
+    } setExist(sudoku(x)(y), x, y)
 
     def fill(x: Int, y: Int): Boolean = {
       if (sudoku(x)(y) == 0) {
@@ -47,12 +50,11 @@ class SimpleSolver extends Solver {
       else if (y < 8) fill(x, y + 1) else if (x < 8) fill(x + 1, 0) else true
     }
 
-    sudoku
+    Future {
+      fill(0, 0);
+      sudoku
+    }
   }
-
-  private val rows: RowColumn = Array.fill(9)(Set[Int]())
-  private val columns: RowColumn = Array.fill(9)(Set[Int]())
-  private val boxes: Boxes = Array.fill(3, 3)(Set[Int]())
 
   private def setExist(v: Int, x: Int, y: Int): Unit = {
     rows(x) += v

@@ -8,10 +8,11 @@ import generator.levels.Level
 import generator.levels.Level.{Easy, Hard, Intermediate}
 import solver.SimpleSolver
 
+import scala.concurrent.{ExecutionContext, Future}
 import scala.io.Source
-import scala.util.{Random, Try, Using}
+import scala.util._
 
-class Sudoku(val g: Grid) extends LazyLogging {
+class Sudoku(var g: Grid)(implicit executionContext: ExecutionContext) extends LazyLogging {
 
   def printout: Unit = {
     println("+" + "---+" * 9)
@@ -45,6 +46,7 @@ class Sudoku(val g: Grid) extends LazyLogging {
       .map(_.close())
   }
 
+  def changeGrid(newGrid: Grid): Unit = this.g = newGrid
 }
 
 object Sudoku {
@@ -52,16 +54,17 @@ object Sudoku {
   type Boxes = Array[Array[Set[Int]]]
   type RowColumn = Array[Set[Int]]
 
-  def apply(level: Level): Sudoku = {
-    val grid = new SimpleSolver().solve(Array.fill(9, 9)(0))
-    val sudoku = new Sudoku(grid)
-    level match {
-      case Easy => remove(sudoku.g, 20)
-      case Intermediate => remove(sudoku.g, 40)
-      case Hard => remove(sudoku.g, 60)
+  def apply(level: Level)(implicit executionContext: ExecutionContext): Future[Sudoku] =
+    new SimpleSolver().solve(Array.fill(9, 9)(0)).map { grid =>
+      val sudoku = new Sudoku(grid)
+      level match {
+        case Easy => remove(sudoku.g, 20)
+        case Intermediate => remove(sudoku.g, 40)
+        case Hard => remove(sudoku.g, 60)
+      }
+      sudoku
     }
-    sudoku
-  }
+
 
   private def remove(a: Grid, count: Int): Unit = {
     val rs = Random.shuffle(List.range(0, 81))
@@ -70,7 +73,7 @@ object Sudoku {
   }
 
 
-  def fromFile(fileName: String): Try[Sudoku] =
+  def fromFile(fileName: File)(implicit executionContext: ExecutionContext): Try[Sudoku] =
     Using(Source.fromFile(fileName)) { source =>
       source.getLines()
         .map {
