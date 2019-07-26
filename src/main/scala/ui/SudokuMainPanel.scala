@@ -3,15 +3,25 @@ package ui
 import java.awt.{Color, Font}
 
 import generator.Sudoku
+import generator.Sudoku.GRID_SIZE
 
 import scala.swing.{GridPanel, Label, Swing}
 
-class SudokuMainPanel(sudoku: Sudoku) extends GridPanel(9, 9) {
+class SudokuMainPanel(sudoku: Sudoku) extends GridPanel(GRID_SIZE, GRID_SIZE) {
 
-  updateLabels(sudoku)
+  var s: Sudoku = sudoku
+  setSudokuLabels(s)
   border = Swing.LineBorder(Color.BLACK)
 
-  def sudokuToLabel(sudoku: Sudoku): Array[Label] = {
+  def setSudokuLabels(sudoku: Sudoku): Unit = {
+    contents.clear()
+    s = sudoku
+    val labels = sudokuToLabel(s)
+    addBorderToLabels(labels)
+    labels.foreach(contents += _)
+  }
+
+  private def sudokuToLabel(sudoku: Sudoku): Array[Label] =
     for {
       rows <- sudoku.g
       row <- rows.toList
@@ -21,9 +31,8 @@ class SudokuMainPanel(sudoku: Sudoku) extends GridPanel(9, 9) {
       l.font = new Font(Font.MONOSPACED, Font.BOLD, 20)
       l
     }
-  }
 
-  def addBorderToLabels(labels: Array[Label]): Unit = {
+  private def addBorderToLabels(labels: Array[Label]): Unit =
     for (i <- labels.indices) {
       if (i / 9 == 3 || i < 9 || i / 9 == 6) {
         labels(i).border = Swing.MatteBorder(2, 0, 0, 0, Color.BLACK)
@@ -35,13 +44,5 @@ class SudokuMainPanel(sudoku: Sudoku) extends GridPanel(9, 9) {
         labels(i).border = Swing.MatteBorder(0, 0, 0, 2, Color.BLACK)
       }
     }
-  }
-
-  def updateLabels(sudoku: Sudoku): Unit = {
-    contents.clear()
-    val labels = sudokuToLabel(sudoku)
-    addBorderToLabels(labels)
-    labels.foreach(contents += _)
-  }
 
 }

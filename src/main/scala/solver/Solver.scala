@@ -1,10 +1,10 @@
 package solver
 
-import generator.Sudoku.Grid
+import generator.Sudoku
 
 import scala.concurrent.Future
 
 trait Solver {
 
-  def solve(sudoku: Grid): Future[Grid]
+  def solve(sudoku: Sudoku): Future[Sudoku]
 }

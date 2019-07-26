@@ -4,7 +4,6 @@ import java.util.concurrent.Executors
 
 import generator.Sudoku
 import javax.swing.{LookAndFeel, UIManager, WindowConstants}
-import solver.SimpleSolver
 
 import scala.concurrent.ExecutionContext
 import scala.swing.BorderPanel.Position._
@@ -18,7 +17,7 @@ class SudokuUI(sudoku: Sudoku) extends Frame {
   preferredSize = new Dimension(Size.WIDTH, Size.HEIGHT)
 
   val mainPanel = new SudokuMainPanel(sudoku)
-  menuBar = new SudokuMenuUI(sudoku, mainPanel, new SimpleSolver)
+  menuBar = new SudokuMenuUI(sudoku, mainPanel)
 
   contents = new BorderPanel {
     layout(mainPanel) = Center
