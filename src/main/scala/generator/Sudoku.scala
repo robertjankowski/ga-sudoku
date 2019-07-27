@@ -1,6 +1,6 @@
 package generator
 
-import java.io.{File, FileWriter}
+import java.io.{File => JFile, FileWriter => JFileWriter}
 
 import com.typesafe.scalalogging.LazyLogging
 import generator.Sudoku._
@@ -17,7 +17,7 @@ class Sudoku(var g: Grid)(implicit executionContext: ExecutionContext) extends L
     println(s"Sudoku ${g.map(_.mkString("")).mkString("")}")
   }
 
-  def toPrettyPrint(): String = {
+  def toPrettyPrint: String = {
     g grouped 3 map {
       _ map {
         _ grouped 3 map {
@@ -31,7 +31,7 @@ class Sudoku(var g: Grid)(implicit executionContext: ExecutionContext) extends L
     val grid: String = g.map {
       row => row.mkString(delimiter)
     }.mkString("\n")
-    val writer = Try(new FileWriter(new File(fileName)))
+    val writer = Try(new JFileWriter(new JFile(fileName)))
     writer
       .map {
         w =>
@@ -40,9 +40,7 @@ class Sudoku(var g: Grid)(implicit executionContext: ExecutionContext) extends L
       }
       .recoverWith {
         case ex: Exception =>
-          logger.error(s"Error in saving to file:\n${
-            ex.getMessage
-          } ")
+          logger.error(s"Error in saving to file:\n${ex.getMessage}")
           writer
       }
       .map(_.close())
@@ -63,7 +61,7 @@ object Sudoku {
     }
   }
 
-  def fromFile(fileName: File)(implicit executionContext: ExecutionContext): Try[Sudoku] =
+  def fromFile(fileName: JFile)(implicit executionContext: ExecutionContext): Try[Sudoku] =
     Using(Source.fromFile(fileName)) { source =>
       source.getLines()
         .map {
@@ -75,7 +73,7 @@ object Sudoku {
   private def remove(a: Grid, count: Int): Unit = {
     val rs = Random.shuffle(List.range(0, GRID_SIZE * GRID_SIZE))
     for (i <- 0 until count)
-      a(rs(i) / 9)(rs(i) % 9) = 0
+      a(rs(i) / GRID_SIZE)(rs(i) % GRID_SIZE) = 0
   }
 
 }

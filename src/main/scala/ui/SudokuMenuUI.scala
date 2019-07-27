@@ -7,6 +7,7 @@ import generator.Sudoku
 import generator.levels.Level
 import generator.levels.Level._
 import solver.{SimpleSolver, Solver}
+import ui.Menus._
 
 import scala.concurrent.ExecutionContext
 import scala.swing.{Action, FileChooser, Menu, MenuBar, MenuItem}
@@ -18,9 +19,9 @@ class SudokuMenuUI(sudoku: Sudoku,
 
   val solver: Solver = new SimpleSolver()
 
-  val generateMenu = Menus.GenerateMenu(sudokuMainPanel)
-  val solverMenu = Menus.SolverMenu(solver, sudokuMainPanel)
-  val fileMenu = Menus.FileMenu(sudokuMainPanel)
+  val generateMenu = GenerateMenu(sudokuMainPanel)
+  val solverMenu = SolverMenu(solver, sudokuMainPanel)
+  val fileMenu = FileMenu(sudokuMainPanel)
 
   contents ++= Seq(fileMenu, generateMenu, solverMenu)
 

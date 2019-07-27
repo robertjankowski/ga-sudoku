@@ -9,6 +9,7 @@ class SimpleSolver(implicit executionContext: ExecutionContext) extends Solver {
   private val s = Math.sqrt(GRID_SIZE).toInt
 
   override def solve(sudoku: Sudoku): Future[Sudoku] = {
+    /// https://gist.github.com/pathikrit/a32e17832296befd6b94
     def solving(grid: Grid, cell: Int = 0): Option[Grid] = (cell % GRID_SIZE, cell / GRID_SIZE) match {
       case (r, `GRID_SIZE`) => Some(grid)
       case (r, c) if grid(r)(c) > 0 => solving(grid, cell + 1)
