@@ -19,6 +19,13 @@ class SudokuMainPanel(sudoku: Sudoku) extends GridPanel(GRID_SIZE, GRID_SIZE) {
     val labels = sudokuToLabel(s)
     addBorderToLabels(labels)
     labels.foreach(contents += _)
+    labels.foreach(l => print(l.text))
+    println()
+  }
+
+  def updateSudoku(sudoku: Sudoku): Unit = {
+    setSudokuLabels(sudoku)
+    this.revalidate()
   }
 
   private def sudokuToLabel(sudoku: Sudoku): Array[Label] =
@@ -44,5 +51,4 @@ class SudokuMainPanel(sudoku: Sudoku) extends GridPanel(GRID_SIZE, GRID_SIZE) {
         labels(i).border = Swing.MatteBorder(0, 0, 0, 2, Color.BLACK)
       }
     }
-
 }

@@ -8,7 +8,7 @@ import generator.levels.Level
 import generator.levels.Level._
 import solver.{SimpleSolver, Solver}
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 import scala.swing.{Action, FileChooser, Menu, MenuBar, MenuItem}
 import scala.util.{Failure, Success}
 
@@ -18,7 +18,6 @@ class SudokuMenuUI(sudoku: Sudoku,
 
   val solver: Solver = new SimpleSolver()
 
-  // TODO: issue with updating sudoku grid, after loading from file solver doesn't work
   val generateMenu = Menus.GenerateMenu(sudokuMainPanel)
   val solverMenu = Menus.SolverMenu(solver, sudokuMainPanel)
   val fileMenu = Menus.FileMenu(sudokuMainPanel)
@@ -38,9 +37,8 @@ object Menus {
     contents += new MenuItem(Action("Open sudoku") {
       val fc = new FileChooser()
       fc.showOpenDialog(null)
-      Sudoku.fromFile(fc.selectedFile).foreach { s =>
-        sudokuMainPanel.setSudokuLabels(s)
-        sudokuMainPanel.revalidate()
+      Sudoku.fromFile(fc.selectedFile).foreach {
+        sudokuMainPanel.updateSudoku
       }
     })
   }
@@ -63,11 +61,9 @@ object Menus {
       setSudoku(Level.Hard)
     })
 
-    private def setSudoku(level: Level): Future[Unit] = {
-      Sudoku(level).map { sudoku =>
-        sudokuMainPanel.setSudokuLabels(sudoku)
-        sudokuMainPanel.revalidate()
-        sudokuMainPanel.s.printout()
+    private def setSudoku(level: Level): Unit = {
+      Sudoku(level).map {
+        sudokuMainPanel.updateSudoku
       }
     }
   }
@@ -85,9 +81,7 @@ object Menus {
     contents += new MenuItem(Action("Simple solver") {
       solver.solve(sudokuMainPanel.s).onComplete {
         case Failure(ex) => logger.error(s"Error occurs in solving sudoku", ex)
-        case Success(sudoku) =>
-          sudokuMainPanel.setSudokuLabels(sudoku)
-          sudokuMainPanel.revalidate()
+        case Success(sudoku) => sudokuMainPanel.updateSudoku(sudoku)
       }
     })
     contents += new MenuItem(Action("GA solver") {

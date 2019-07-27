@@ -13,41 +13,40 @@ import scala.util._
 
 class Sudoku(var g: Grid)(implicit executionContext: ExecutionContext) extends LazyLogging {
 
-  def printout(): Unit = {
-    println("+" + "---+" * GRID_SIZE)
-    for ((row, i) <- g.zipWithIndex) {
-      val r = row.map { v =>
-        if (v != 0) v.toString else " "
-      }
-      print("|")
-      for (j <- 0 until 3)
-        print(s" ${r(j)}   ${r(j + 1)}   ${r(j + 2)} |")
-      println()
-      if (i % 3 == 2)
-        println("+" + "---+" * GRID_SIZE)
-      else
-        println("+" + "   +" * GRID_SIZE)
-    }
+  def printOneLine(): Unit = {
+    println(s"Sudoku ${g.map(_.mkString("")).mkString("")}")
+  }
+
+  def toPrettyPrint(): String = {
+    g grouped 3 map {
+      _ map {
+        _ grouped 3 map {
+          _ mkString " "
+        } mkString " | "
+      } mkString "\n"
+    } mkString s"\n${"-" * 11 mkString " "}\n"
   }
 
   def toFile(fileName: String)(delimiter: String = " "): Try[Unit] = {
-    val grid: String = g.map { row => row.mkString(delimiter) }.mkString("\n")
+    val grid: String = g.map {
+      row => row.mkString(delimiter)
+    }.mkString("\n")
     val writer = Try(new FileWriter(new File(fileName)))
     writer
       .map {
-        w => w.write(grid); w
+        w =>
+          w.write(grid);
+          w
       }
       .recoverWith {
         case ex: Exception =>
-          logger.error(s"Error in saving to file:\n${ex.getMessage}")
+          logger.error(s"Error in saving to file:\n${
+            ex.getMessage
+          } ")
           writer
       }
       .map(_.close())
   }
-
-  def changeGrid(newGrid: Grid): Unit = this.g = newGrid
-
-  def getGrid: Grid = g
 }
 
 object Sudoku {

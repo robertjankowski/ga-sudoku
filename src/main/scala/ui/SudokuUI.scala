@@ -8,6 +8,7 @@ import javax.swing.{LookAndFeel, UIManager, WindowConstants}
 import scala.concurrent.ExecutionContext
 import scala.swing.BorderPanel.Position._
 import scala.swing._
+import scala.util.Try
 
 class SudokuUI(sudoku: Sudoku) extends Frame {
 
@@ -26,12 +27,12 @@ class SudokuUI(sudoku: Sudoku) extends Frame {
 }
 
 object SudokuUI {
-  def create(sudoku: Sudoku, look: LookAndFeel): Unit = {
-    UIManager.setLookAndFeel(look)
-    val s = new SudokuUI(sudoku)
-    s.peer.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE)
-    s.open()
-  }
+  def create(sudoku: Sudoku, look: LookAndFeel): Unit =
+    Try(new SudokuUI(sudoku)).foreach { s =>
+      UIManager.setLookAndFeel(look)
+      s.peer.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE)
+      s.open()
+    }
 }
 
 object Size {
