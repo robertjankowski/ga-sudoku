@@ -11,7 +11,7 @@ class SimpleSolver(implicit executionContext: ExecutionContext) extends Solver {
   override def solve(sudoku: Sudoku): Future[Sudoku] = {
     /// https://gist.github.com/pathikrit/a32e17832296befd6b94
     def solving(grid: Grid, cell: Int = 0): Option[Grid] = (cell % GRID_SIZE, cell / GRID_SIZE) match {
-      case (r, `GRID_SIZE`) => Some(grid)
+      case (_, `GRID_SIZE`) => Some(grid)
       case (r, c) if grid(r)(c) > 0 => solving(grid, cell + 1)
       case (r, c) =>
         def cells(i: Int) = Seq(grid(r)(i), grid(i)(c), grid(s * (r / s) + i / s)(s * (c / s) + i % s))

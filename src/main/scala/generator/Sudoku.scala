@@ -11,7 +11,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.io.Source
 import scala.util._
 
-class Sudoku(var g: Grid)(implicit executionContext: ExecutionContext) extends LazyLogging {
+class Sudoku(var g: Grid) extends LazyLogging {
 
   def printOneLine(): Unit = {
     println(s"Sudoku ${g.map(_.mkString("")).mkString("")}")
@@ -49,15 +49,13 @@ class Sudoku(var g: Grid)(implicit executionContext: ExecutionContext) extends L
 
 object Sudoku {
   type Grid = Array[Array[Int]]
-  type Boxes = Array[Array[Set[Int]]]
-  type RowColumn = Array[Set[Int]]
   val GRID_SIZE = 9
 
   def apply(level: Level)(implicit executionContext: ExecutionContext): Future[Sudoku] = {
     val sudoku = new Sudoku(Array.fill(GRID_SIZE, GRID_SIZE)(0))
     new SimpleSolver().solve(sudoku).map { sudoku =>
       remove(sudoku.g, level.removal)
-      sudoku
+      new SudokuGenerator(sudoku).generate()
     }
   }
 
