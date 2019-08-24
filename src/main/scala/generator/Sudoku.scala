@@ -6,6 +6,7 @@ import com.typesafe.scalalogging.LazyLogging
 import generator.Sudoku._
 import generator.levels.Level
 import solver.SimpleSolver
+import utils.Using.using
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.io.Source
@@ -59,14 +60,15 @@ object Sudoku {
     }
   }
 
-  def fromFile(fileName: JFile)(implicit executionContext: ExecutionContext): Try[Sudoku] =
-    Using(Source.fromFile(fileName)) { source =>
+  def fromFile(fileName: JFile)(implicit executionContext: ExecutionContext): Try[Sudoku] = {
+    using(Source.fromFile(fileName)) { source =>
       source.getLines()
         .map {
           _.split(" ").map(_.trim.toInt)
         }
         .toArray
     }.map(new Sudoku(_))
+  }
 
   private def remove(a: Grid, count: Int): Unit = {
     val rs = Random.shuffle(List.range(0, GRID_SIZE * GRID_SIZE))

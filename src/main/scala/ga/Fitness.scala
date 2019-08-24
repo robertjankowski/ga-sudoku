@@ -1,25 +1,27 @@
 package ga
 
-import generator.Sudoku
+import generator.Sudoku.Grid
 
-class Fitness {
+object Fitness {
 
   /**
-   * Fitness function works as follow:
-   *
-   * E.g for rows (the same for columns and 3x3 blocks):
-   * f = sum over rows  { 9 - no. of distinct value in row } // how many incorrect values are in the single row
-   */
-  def calculateFitness(sudoku: Sudoku): Int = checkRows(sudoku.g) + checkColumns(sudoku.g) + checkSquares(sudoku.g)
+    * Fitness function works as follow:
+    *
+    * E.g for rows (the same for columns and 3x3 blocks):
+    * f = sum over rows  { 9 - no. of distinct value in row } // how many incorrect values are in the single row
+    *
+    */
+  def calculateFitness(grid: Grid): Int =
+    checkRows(grid) + checkColumns(grid) + checkSquares(grid)
 
-  private def checkRows(grid: Sudoku.Grid) =
+  private def checkRows(grid: Grid) =
     grid.map {
       g => g.length - g.distinct.length
     }.sum
 
-  private def checkColumns(grid: Sudoku.Grid) = checkRows(grid.transpose)
+  private def checkColumns(grid: Grid) = checkRows(grid.transpose)
 
-  private def checkSquares(grid: Sudoku.Grid) = {
+  private def checkSquares(grid: Grid) = {
     var boxes = Array.empty[Array[Int]]
     for {
       r <- 0 until 3

@@ -33,13 +33,17 @@ class SudokuMenuUI(sudoku: Sudoku,
 object Menus {
 
   class FileMenu(sudokuMainPanel: SudokuMainPanel)
-                (implicit executionContext: ExecutionContext) extends Menu("File") {
+                (implicit executionContext: ExecutionContext)
+    extends Menu("File")
+      with LazyLogging {
 
     contents += new MenuItem(Action("Open sudoku") {
       val fc = new FileChooser()
       fc.showOpenDialog(null)
-      Sudoku.fromFile(fc.selectedFile).foreach {
-        sudokuMainPanel.updateSudoku
+      Sudoku.fromFile(fc.selectedFile) match {
+        case Failure(exception) =>
+          logger.error(s"Unable to load sudoku from file: $exception")
+        case Success(sudoku) => sudokuMainPanel.updateSudoku(sudoku)
       }
     })
   }
