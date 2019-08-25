@@ -12,6 +12,5 @@ object Boot extends App {
   val sudokuUI = Sudoku(Level.Easy).map { sudoku =>
     SudokuUI.create(sudoku, new NimbusLookAndFeel)
   }
-  println("Hello from APP")
   Await.ready(sudokuUI, 2 seconds)
 }

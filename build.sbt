@@ -19,11 +19,7 @@ scalacOptions ++= Seq(
 )
 
 libraryDependencies ++= Seq(
-  "com.typesafe.akka"          %% "akka-actor"      % "2.5.25",
-  "com.typesafe.akka"          %% "akka-stream"     % "2.5.25",
-  "org.typelevel"              %% "cats-effect"     % "1.3.1",
   "ch.qos.logback"             %  "logback-classic" % "1.2.3",
-  "com.softwaremill"           %  "helisa_2.12"     % "0.8.0",
   "com.typesafe.scala-logging" %% "scala-logging"   % "3.9.2",
   "org.scala-lang.modules"     %% "scala-swing"     % "2.1.1",
 )
