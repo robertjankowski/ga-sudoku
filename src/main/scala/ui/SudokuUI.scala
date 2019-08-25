@@ -28,7 +28,7 @@ class SudokuUI(sudoku: Sudoku) extends Frame {
 
 object SudokuUI {
   def create(sudoku: Sudoku, look: LookAndFeel): Unit =
-    Try(new SudokuUI(sudoku)).foreach { s =>
+    Try { new SudokuUI(sudoku) }.foreach { s =>
       UIManager.setLookAndFeel(look)
       s.peer.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE)
       s.open()

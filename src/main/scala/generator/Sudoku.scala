@@ -55,8 +55,8 @@ object Sudoku {
   def apply(level: Level)(implicit executionContext: ExecutionContext): Future[Sudoku] = {
     val sudoku = new Sudoku(Array.fill(GRID_SIZE, GRID_SIZE)(0))
     new SimpleSolver().solve(sudoku).map { sudoku =>
-      remove(sudoku.g, level.removal)
-      new SudokuGenerator(sudoku).generate()
+      remove(sudoku.g, level.getBlocksNumber)
+      new SudokuGenerator(sudoku.g).generate()
     }
   }
 
@@ -68,6 +68,22 @@ object Sudoku {
         }
         .toArray
     }.map(new Sudoku(_))
+  }
+
+  def createBoxes(grid: Grid): Grid = {
+    var boxes = Array.empty[Array[Int]]
+    for {
+      r <- 0 until 3
+      c <- 0 until 3
+    } {
+      var b = Array.empty[Int]
+      for {
+        i <- 0 until 3
+        j <- 0 until 3
+      } b +:= grid(3 * r + i)(3 * c + j)
+      boxes +:= b
+    }
+    boxes
   }
 
   private def remove(a: Grid, count: Int): Unit = {

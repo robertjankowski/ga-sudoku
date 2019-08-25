@@ -1,23 +1,26 @@
 package ga
 
+import generator.SudokuGenerator
 import generator.Sudoku.Grid
 import generator.Sudoku.GRID_SIZE
 
-import scala.util.Random
-
-class Individual(val grid: Grid)(implicit random: Random) {
+class Individual(val grid: Grid) {
 
   /**
     * Own grid is permutation of 1 to 9 ranges
     */
-  private var ownGrid: Grid = createGrid
+  var ownGrid: Grid = createGrid
   var fitness: Double = 0
 
-  def updateFitness(): Unit = {
+  def updateFitness(): Unit =
     fitness = Fitness.calculateFitness(ownGrid, grid)
+
+  def transposeGrid(): Unit = {
+    ownGrid = ownGrid.transpose
   }
 
-  private def createGrid =
-    Array.range(1, 9).map(_ => (1 to GRID_SIZE).toArray)
-
+  private def createGrid = {
+    val g = Array.range(1, 10).map(_ => (1 to GRID_SIZE).toArray)
+    new SudokuGenerator(g).generate().g
+  }
 }
