@@ -34,3 +34,19 @@ sbt run
 ```bash
 xhost +
 ```
+
+
+*** 
+On Windows
+
+1. Install [`Xming` server](https://sourceforge.net/projects/xming/)
+
+2. Add your ip to `Xming` server. Find `X0.hosts` file in Xming instalation folder and add your ip below.
+
+3. Set DISPLAY variable (powershell) `set-variable -name DISPLAY -value YOUR_IP:0.0`
+
+4. Run app
+```powershell
+docker run -it --privileged -e DISPLAY=$DISPLAY \ 
+-v /tmp/.X11-unix:/tmp/.X11-unix robjankowski/ga-sudoku:0.1
+```
