@@ -109,14 +109,11 @@ class GA(solution: Grid) extends Solver {
   }
 
   private def crossSmallGrids(id1: Individual, id2: Individual, position: Int): Unit = {
-    val smallGrid1 = Sudoku.createBoxes(id1.ownGrid)
-    val smallGrid2 = Sudoku.createBoxes(id2.ownGrid)
-
-    // update grid of individuals to boxes
-
-    // crossRow
-
-    // return to initial grid
+    id1.ownGrid = Sudoku.createBoxes(id1.ownGrid)
+    id2.ownGrid = Sudoku.createBoxes(id2.ownGrid)
+    crossRows(id1, id2, position)
+    id1.ownGrid = Sudoku.boxesToGrid(id1.ownGrid)
+    id2.ownGrid = Sudoku.boxesToGrid(id2.ownGrid)
   }
 
 
@@ -134,13 +131,15 @@ class GA(solution: Grid) extends Solver {
   }
 
   private def mutateSmallGrid(individual: Individual, position: Int, pos1: Int, pos2: Int): Unit = {
-    // TODO
+    individual.ownGrid = Sudoku.createBoxes(individual.ownGrid)
+    mutateRow(individual, position, pos1, pos2)
+    individual.ownGrid = Sudoku.boxesToGrid(individual.ownGrid)
   }
 
 }
 
 object GA {
-  val POPULATION_SIZE = 500
+  val POPULATION_SIZE = 1000
   val MAX_GENERATIONS = 2000
   val MUTATION_RATE = 0.4
 }

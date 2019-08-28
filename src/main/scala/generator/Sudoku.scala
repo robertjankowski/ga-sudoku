@@ -8,6 +8,7 @@ import generator.levels.Level
 import solver.SimpleSolver
 import utils.Using.using
 
+import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.{ExecutionContext, Future}
 import scala.io.Source
 import scala.util._
@@ -84,6 +85,24 @@ object Sudoku {
       boxes +:= b
     }
     boxes
+  }
+
+  def boxesToGrid(grid: Grid): Grid = {
+    val g = ArrayBuffer.empty[Array[Int]]
+    for {
+      i <- 2 until 9 by 3
+      j <- 2 until 9 by 3
+    } {
+      var smallGrid = ArrayBuffer.empty[Int]
+      for {
+        k <- 2 to 0 by -1
+        l <- 2 to 0 by -1
+      } {
+        smallGrid += grid(i - k)(j - l)
+      }
+      g += smallGrid.reverse.toArray
+    }
+    g.toArray
   }
 
   private def remove(a: Grid, count: Int): Unit = {

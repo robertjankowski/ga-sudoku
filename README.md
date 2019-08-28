@@ -36,7 +36,7 @@ xhost +
 ```
 
 
-*** 
+***
 On Windows
 
 1. Install [`Xming` server](https://sourceforge.net/projects/xming/)
